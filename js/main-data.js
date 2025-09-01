@@ -35,6 +35,26 @@ function getElementPic({ url, views, rating }) {
     return elementPic;
 }
 
+const renderTopAnime = (animes) => {
+    const container = document.querySelector(".filter__gallery");
+    container.innerHTML = "";
+
+    animes.forEach(anime => {
+        container.insertAdjacentHTML("afterbegin", `
+            <div class="product__sidebar__view__item set-bg mix"
+                data-setbg="${anime.image}">
+                <div class="ep">${anime.rating} / 10</div>
+                <div class="view"><i class="fa fa-eye"></i>${anime.views}</div>
+                <h5><a href="/anime-details.html">${anime.title}</a></h5>
+            </div>
+        `);
+    })
+}
+
+const renderAnimeList = (animeList, genres) => {
+
+}
+
 const mainData = async () => {
     const url = "https://glo--anime-site-default-rtdb.europe-west1.firebasedatabase.app/anime.json";
 
@@ -42,8 +62,18 @@ const mainData = async () => {
         console.log(response)
         return response.json();
     }).then((animeList) => {
-        const parent = document.querySelector(".trending__product .row:nth-child(2)");
 
+        const topAnimes = animeList.sort((a1, a2) => a2.views - a1.views).slice(0, 5);
+        renderTopAnime(topAnimes);
+
+        const genres = animeList.reduce((acc, anime) => {
+            acc.add(anime.ganre);
+            return acc;
+        }, new Set());
+        renderAnimeList(animeList, genres);
+
+
+        const parent = document.querySelector(".trending__product .row:nth-child(2)");
         animeList.forEach((anime) => {
             const element = document.createElement('div');
             element.classList.add("col-lg-4", "col-md-6", "col-sm-8");
@@ -73,6 +103,9 @@ const mainData = async () => {
         console.error("Ошибка получения аниме");
         throw err;
     });
+
+
+
 };
 
 export default mainData;
